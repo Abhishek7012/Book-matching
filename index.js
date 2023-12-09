@@ -1,53 +1,86 @@
 const express = require('express');
 const cors = require('cors');
-const connectDB = require('./Connectiondb');
-const Data = require('./Datamodel');
+const connectDB = require('./connections/Connectiondb');
 const app = express();
-const PORT = 5000;
-const { booksdata } = require('./Booksdata');
-const Book = require('./Booksdatamodel');
+const PORT = 5004;
+const { booksdata } = require('./data/Booksdata');
+const Book = require('./modal/Booksmodal');
+const User = require('./modal/Usermodal');
+SIMILARITY_THRESHOLD = 6
+MAX_MATCHES = 5
+const euclideanDistance = require('./utils/euclideanDistance');
 
-
+// Set up CORS
 app.use(cors());
 app.use(express.json());
-
+// Connect to the database
 connectDB();
 
-app.get('/data1', async (req, res) => {
-  try {
-    const data = await Data.find();
-    res.json(data);
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
+// Handle matching book request
+app.post('/matching-book', async (req, res) => {
+    try {
+        // Extract user preferences from the request body
+        const { name, interestInFantasy, preferenceForShortStories, likingForColorfulNarratives } = req.body
+        // Create a new user instance
+        const newUser = new User({
+            name,
+            interestInFantasy,
+            preferenceForShortStories,
+            likingForColorfulNarratives,
+        });
+        // Save the new user to the database
+        newUser.save()
+
+        // Create a vector of user preferences
+        const userVector = [interestInFantasy, preferenceForShortStories, likingForColorfulNarratives];
+
+        // Retrieve all books from the database
+        const books = await Book.find();
+        const bookMatches = [];
+        // Iterate through each book to find matches
+        books.forEach((book) => {
+            const bookVector = [book.interestInFantasy, book.preferenceForShortStories, book.likingForColorfulNarratives];
+
+            // Calculate the Euclidean distance between user and book preferences
+            const difference = euclideanDistance(userVector, bookVector);
+            // Check if the book is a match based on the similarity threshold
+            if (difference < SIMILARITY_THRESHOLD) {
+                bookMatches.push({ book, difference });
+            }
+        });
+
+        // Sort and filter the top matches
+        bookMatches.sort((a, b) => a.difference - b.difference);
+        const topMatches = bookMatches.slice(0, MAX_MATCHES);
+
+        // Return the top matches as JSON response
+        return res.status(200).json({ bookMatches: topMatches });
+
+    } catch (error) {
+        // Handle any errors and send a 500 status with error message
+        res.status(500).json({ error: error });
+    }
 });
 
-app.post('/data2', async (req, res) => {
-  try {
-    const newItems = await Data.insertMany(req.body);
-    res.json({ message: 'Item added successfully' });
-  } catch (error) {
-    console.error('Error adding data:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
+// Initialize the database with books data
 const initializeDatabase = async () => {
     try {
-      const existingDataCount = await Book.countDocuments();
-      if (existingDataCount === 0) {
-        await Book.insertMany(booksdata);
-        console.log('Books data has been successfully inserted into the database');
-      } else {
-        console.log('Books data already exists in the database');
-      }
+        // Check if books data already exists in the database
+        const existingBookCount = await Book.countDocuments();
+        if (existingBookCount === 0) {
+            // Insert books data into the database if it doesn't exist
+            await Book.insertMany(booksdata);
+            console.log('Books data has been successfully inserted into the database');
+        } else {
+            console.log('Books data already exists in the database');
+        }
     } catch (error) {
-      console.error('Error initializing the database with books data:', error);
+        console.error('Error initializing the database with data:', error);
     }
-  };
+};
 
+// Start the server and initialize the database
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-  initializeDatabase();
+    console.log(`Server is running on http://localhost:${PORT}`);
+    initializeDatabase();
 });

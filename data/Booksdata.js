@@ -1,0 +1,68 @@
+module.exports = {
+  booksdata: [
+      {
+          cover: "./images/sherlock.jpg",
+          title: "The Adventures of Sherlock Holmes",
+          author: "Arthur Conan Doyle",
+          interestInFantasy: 8,
+          preferenceForShortStories: 7,
+          likingForColorfulNarratives: 9,
+      },
+      {
+          cover: "./images/ninth.jpg",
+          title: "Ninth House",
+          author: "Leigh Bardugo",
+          interestInFantasy: 5,
+          preferenceForShortStories: 8,
+          likingForColorfulNarratives: 6,
+      },
+      {
+          cover: "./images/musketeers.jpg",
+          title: "The Three Musketeers",
+          author: "Alexandre Dumas",
+          interestInFantasy: 7,
+          preferenceForShortStories: 6,
+          likingForColorfulNarratives: 8,
+      },
+      {
+          cover: "./images/mockingbird.jpg",
+          title: "To Kill a Mockingbird",
+          author: "Harper Lee",
+          interestInFantasy: 3,
+          preferenceForShortStories: 9,
+          likingForColorfulNarratives: 4,
+      },
+      {
+          cover: "./images/horse.jpg",
+          title: "The Boy, the Mole, the Fox and the Horse",
+          author: "Charlie Mackesy",
+          interestInFantasy: 6,
+          preferenceForShortStories: 7,
+          likingForColorfulNarratives: 9,
+      },
+      {
+          cover: "./images/geisha.jpg",
+          title: "Vintage Memoirs of a Geisha",
+          author: "Arthur Golden",
+          interestInFantasy: 4,
+          preferenceForShortStories: 5,
+          likingForColorfulNarratives: 8,
+      },
+      {
+          cover: "./images/royal.jpg",
+          title: "Royal Holiday",
+          author: "Jasmine Guillory",
+          interestInFantasy: 8,
+          preferenceForShortStories: 6,
+          likingForColorfulNarratives: 7,
+      },
+      {
+          cover: "./images/testaments.jpg",
+          title: "Nan A. Talese The Testaments",
+          author: "Margaret Atwood",
+          interestInFantasy: 9,
+          preferenceForShortStories: 7,
+          likingForColorfulNarratives: 10,
+      },
+  ]
+};
